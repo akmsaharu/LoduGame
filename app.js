@@ -1,4 +1,4 @@
-
+﻿
 const serverConnect = require("./connection");
 const sgdsoft = require("./SGDSOFT_Plugin/SGDSOFT_Plugin.js");
 var uuid = require('uuid-random');
@@ -76,6 +76,7 @@ serverConnect.wssExport().on('connection', function (ws) {
         'SGDSOFT@BetAmount',
         'SGDSOFT@micStatus'
     ];
+    ];
 
      events.forEach(event => {
         sgdsoft.SGDSOFT_WEBSOCKET_On(event, ws, (data) => {
@@ -92,11 +93,13 @@ serverConnect.wssExport().on('connection', function (ws) {
             room.clients = room.clients.filter(client => client !== ws);
 
             if (room.clients.length == 0 && room.info.locked) {
-               // rooms.delete(roomKey);
+                //rooms.delete(roomKey);
                 delete rooms[roomKey];
-            } else if (room.clients.length == 0 && room.info.locked == false) {
-                rooms.delete(roomKey);
-            } else {
+            }else if (room.clients.length == 0 && room.info.locked == false) {
+                // rooms.delete(roomKey);
+                delete rooms[roomKey];
+            }
+            else {
                 Room(roomKey);
 
                 const leftUser = {
@@ -136,7 +139,27 @@ function CreateAndJoinRoom(ws, requestedRoomKeyOrName, userLength) {
 
     let targetRoomKey = null;
 
+    const candidateRooms = [];
     for (const key in rooms) {
+        const room = rooms[key];
+        if (
+            room.info.name === requestedRoomKeyOrName &&
+            !room.info.locked &&
+            room.clients.length < room.info.maxUsers
+        ) {
+            candidateRooms.push(key);
+        }
+    }
+
+    if (candidateRooms.length > 0) {
+        // join any one room from candidateRooms
+        targetRoomKey = candidateRooms[0]; // or choose randomly if you want
+    } else {
+        CreateRoom(ws, requestedRoomKeyOrName, userLength);
+        return;
+    }
+
+    /*for (const key in rooms) {
         const room = rooms[key];
         if (!room.info.locked && room.clients.length < room.info.maxUsers) {
             targetRoomKey = key;
@@ -147,7 +170,7 @@ function CreateAndJoinRoom(ws, requestedRoomKeyOrName, userLength) {
     if (!targetRoomKey) {
         CreateRoom(ws, requestedRoomKeyOrName, userLength);
         return;
-    }
+    }*/
 
     const room = rooms[targetRoomKey];
     const randomInt = getRandomInt(500, 1000) + room.clients.length;
