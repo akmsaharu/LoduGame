@@ -76,7 +76,6 @@ serverConnect.wssExport().on('connection', function (ws) {
         'SGDSOFT@BetAmount',
         'SGDSOFT@micStatus'
     ];
-    ];
 
      events.forEach(event => {
         sgdsoft.SGDSOFT_WEBSOCKET_On(event, ws, (data) => {
@@ -151,15 +150,7 @@ function CreateAndJoinRoom(ws, requestedRoomKeyOrName, userLength) {
         }
     }
 
-    if (candidateRooms.length > 0) {
-        // join any one room from candidateRooms
-        targetRoomKey = candidateRooms[0]; // or choose randomly if you want
-    } else {
-        CreateRoom(ws, requestedRoomKeyOrName, userLength);
-        return;
-    }
-
-    /*for (const key in rooms) {
+    for (const key in rooms) {
         const room = rooms[key];
         if (!room.info.locked && room.clients.length < room.info.maxUsers) {
             targetRoomKey = key;
@@ -170,7 +161,7 @@ function CreateAndJoinRoom(ws, requestedRoomKeyOrName, userLength) {
     if (!targetRoomKey) {
         CreateRoom(ws, requestedRoomKeyOrName, userLength);
         return;
-    }*/
+    }
 
     const room = rooms[targetRoomKey];
     const randomInt = getRandomInt(500, 1000) + room.clients.length;
