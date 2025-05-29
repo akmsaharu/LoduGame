@@ -138,18 +138,6 @@ function CreateAndJoinRoom(ws, requestedRoomKeyOrName, userLength) {
 
     let targetRoomKey = null;
 
-    const candidateRooms = [];
-    for (const key in rooms) {
-        const room = rooms[key];
-        if (
-            room.info.name === requestedRoomKeyOrName &&
-            !room.info.locked &&
-            room.clients.length < room.info.maxUsers
-        ) {
-            candidateRooms.push(key);
-        }
-    }
-
     for (const key in rooms) {
         const room = rooms[key];
         if (!room.info.locked && room.clients.length < room.info.maxUsers) {
